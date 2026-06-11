@@ -58,7 +58,7 @@ const ProjectSection = () => {
   };
 
   return (
-    <div className=" relative w-full bg-black pt-20 py-8 px-14">
+    <div id="projects" className=" relative w-full bg-black pt-20 py-8 px-14">
       <div className="text-white flex flex-col items-start">
 
         {/* Tag line */}

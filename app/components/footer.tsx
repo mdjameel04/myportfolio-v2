@@ -61,9 +61,9 @@ const navColumns = [
 ];
 
 const socials = [
-  { label: "Threads", icon: <ThreadsIcon />, href: "https://threads.net/@webxaistudio" },
-  { label: "GitHub",  icon: <GithubIcon />,  href: "https://github.com/webxaistudio" },
-  { label: "LinkedIn",icon: <LinkedinIcon />, href: "https://linkedin.com/in/webxaistudio" },
+  { label: "Threads", icon: <ThreadsIcon />, href: "https://www.threads.com/@webx.aistudio" },
+  { label: "GitHub",  icon: <GithubIcon />,  href: "https://github.com/mdjameel04" },
+  { label: "LinkedIn",icon: <LinkedinIcon />, href: "https://www.linkedin.com/in/mohammed-jameel04/" },
   { label: "Gumroad", icon: <GumroadIcon />,  href: "https://webxaistudio.gumroad.com" },
 ];
 

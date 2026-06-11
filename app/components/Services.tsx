@@ -175,7 +175,7 @@ function ServiceCard({ service }: { service: Service }) {
 // ─── MAIN EXPORT ─────────────────────────────────
 export default function ServicesSection() {
   return (
-    <section className="relative bg-[#080808] overflow-hidden">
+    <section id="services" className="relative bg-[#080808] overflow-hidden">
       {/* Aurora background */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Left aurora */}
