@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 
 const Projects = [
-  { id: "01", name: "ImageFlow", image: "/herobackground.png" },
+  { id: "01", name: "ImageFlow", image: "/imageflow.png" },
   { id: "02", name: "PrepForze", image: "/prepforge.png" },
   { id: "03", name: "ai-saas-starter", image: "/ai-saas-kit.png" },
   { id: "04", name: "remove-bg", image: "/removeBg.png" },
