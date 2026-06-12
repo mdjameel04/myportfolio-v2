@@ -52,7 +52,7 @@ export default function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-[13px] text-neutral-500 hover:text-white transition-colors duration-200
+                className=" text-neutral-500 hover:text-white transition-colors duration-200
                            tracking-wide relative group"
               >
                 {link.label}

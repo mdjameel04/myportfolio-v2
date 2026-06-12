@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Monitor, Sparkles, Code2, Globe, FileText, BarChart2, FlaskConical, LayoutDashboard, Server, Package, Wrench, Cpu, Store, Bell,
 } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // ─── TYPES ────────────────────────────────────────
 interface Tag {
@@ -33,7 +38,6 @@ const services: Service[] = [
       { icon: <FlaskConical size={11} />, label: "CONVERSION OPTIMIZATION" },
     ],
   },
-
   {
     num: "02",
     icon: <Sparkles size={18} strokeWidth={1.5} />,
@@ -47,7 +51,6 @@ const services: Service[] = [
       { icon: <Wrench size={11} />, label: "SUBSCRIPTIONS & BILLING" },
     ],
   },
-
   {
     num: "03",
     icon: <Store size={18} strokeWidth={1.5} />,
@@ -61,7 +64,6 @@ const services: Service[] = [
       { icon: <Bell size={11} />, label: "PAYMENTS & AUTOMATION" },
     ],
   },
-
   {
     num: "04",
     icon: <Globe size={18} strokeWidth={1.5} />,
@@ -78,14 +80,73 @@ const services: Service[] = [
 ];
 
 // ─── SERVICE CARD ─────────────────────────────────
-function ServiceCard({ service }: { service: Service }) {
+function ServiceCard({
+  service,
+  index,
+}: {
+  service: Service;
+  index: number;
+}) {
   const [hovered, setHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tagsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    const tagsEl = tagsRef.current;
+    if (!card || !tagsEl) return;
+
+    const tags = tagsEl.querySelectorAll("span");
+
+    // Card entrance — staggered by index
+    gsap.fromTo(
+      card,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        ease: "power3.out",
+        delay: index * 0.12,
+        scrollTrigger: {
+          trigger: card,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      }
+    );
+
+    // Tags stagger in after card
+    gsap.fromTo(
+      tags,
+      { opacity: 0, y: 10 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: "power2.out",
+        stagger: 0.07,
+        delay: index * 0.12 + 0.3,
+        scrollTrigger: {
+          trigger: card,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      }
+    );
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, [index]);
 
   return (
     <div
+      ref={cardRef}
       className="relative flex flex-col justify-between p-8 lg:p-10 overflow-hidden cursor-pointer
                  border border-neutral-800/50 bg-[#0c0c0c]/80
                  transition-all duration-500"
+      style={{ opacity: 0 }} // start hidden, GSAP reveals
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -99,8 +160,8 @@ function ServiceCard({ service }: { service: Service }) {
       {/* Ghost number */}
       <span
         className="absolute bottom-2 right-5 select-none pointer-events-none
-                   font-bold text-[110px] leading-none transition-all duration-500
-                   text-white/[0.04] group-hover:text-white/[0.07]"
+                   font-bold text-[110px] leading-none
+                   text-white/[0.04]"
         style={{ fontFamily: "'Instrument Serif', serif" }}
       >
         {service.num}
@@ -136,7 +197,7 @@ function ServiceCard({ service }: { service: Service }) {
 
       {/* Bottom: tags + arrow */}
       <div className="relative z-10 mt-10">
-        <div className="flex flex-wrap gap-2 mb-7">
+        <div ref={tagsRef} className="flex flex-wrap gap-2 mb-7">
           {service.tags.map((tag) => (
             <span
               key={tag.label}
@@ -146,6 +207,7 @@ function ServiceCard({ service }: { service: Service }) {
                             ? "border-lime-400/25 text-lime-400/75 bg-lime-400/5"
                             : "border-neutral-800 text-neutral-600"
                           }`}
+              style={{ opacity: 0 }} // start hidden, GSAP reveals
             >
               <span className={`transition-colors duration-300 ${hovered ? "text-lime-400/70" : "text-neutral-700"}`}>
                 {tag.icon}
@@ -174,27 +236,80 @@ function ServiceCard({ service }: { service: Service }) {
 
 // ─── MAIN EXPORT ─────────────────────────────────
 export default function ServicesSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // ── Eyebrow slide in
+      gsap.fromTo(
+        eyebrowRef.current,
+        { opacity: 0, x: -20 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: eyebrowRef.current,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // ── Heading — SplitText char-by-char reveal
+      if (headingRef.current) {
+        const split = new SplitText(headingRef.current, {
+          type: "chars,words",
+          charsClass: "char",
+        });
+
+        gsap.fromTo(
+          split.chars,
+          { opacity: 0, y: 30, rotateX: -40 },
+          {
+            opacity: 1,
+            y: 0,
+            rotateX: 0,
+            duration: 0.5,
+            ease: "power3.out",
+            stagger: 0.025,
+            scrollTrigger: {
+              trigger: headingRef.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          }
+        );
+
+        // cleanup split on unmount
+        return () => split.revert();
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="services" className="relative bg-[#080808] overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="services"
+      className="relative bg-[#080808] overflow-hidden"
+    >
       {/* Aurora background */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Left aurora */}
-        <div
-          className="absolute left-[-10%] top-[30%] w-[500px] h-[300px] rounded-full
-                     bg-lime-600/20 blur-[120px] rotate-[-20deg]"
-        />
-        {/* Right aurora */}
-        <div
-          className="absolute right-[-5%] top-[10%] w-[400px] h-[250px] rounded-full
-                     bg-lime-500/15 blur-[100px] rotate-[15deg]"
-        />
+        <div className="absolute left-[-10%] top-[30%] w-[500px] h-[300px] rounded-full bg-lime-600/20 blur-[120px] rotate-[-20deg]" />
+        <div className="absolute right-[-5%] top-[10%] w-[400px] h-[250px] rounded-full bg-lime-500/15 blur-[100px] rotate-[15deg]" />
       </div>
 
       <div className="relative z-10 max-w-[1320px] mx-auto px-6 lg:px-12 py-20 lg:py-24">
 
         {/* Eyebrow */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-8 h-px bg-neutral-700" />
+        <div ref={eyebrowRef} className="flex items-center gap-3 mb-8" style={{ opacity: 0 }}>
+          <div ref={lineRef} className="w-8 h-px bg-neutral-700" />
           <p className="text-[11px] tracking-widest text-neutral-500 uppercase">
             <span className="text-lime-400">[03]</span>&nbsp;&nbsp;SERVICES / WHAT WE DO
           </p>
@@ -202,8 +317,9 @@ export default function ServicesSection() {
 
         {/* Heading */}
         <h2
+          ref={headingRef}
           className="text-5xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-14 text-white"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
+          style={{ fontFamily: "'DM Sans', sans-serif", perspective: "600px" }}
         >
           Four{" "}
           <em
@@ -217,10 +333,10 @@ export default function ServicesSection() {
           team.
         </h2>
 
-        {/* 2x2 Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 bg-neutral-800/30 ">
-          {services.map((service) => (
-            <ServiceCard key={service.num} service={service} />
+        {/* 2×2 Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 bg-neutral-800/30">
+          {services.map((service, i) => (
+            <ServiceCard key={service.num} service={service} index={i} />
           ))}
         </div>
 
